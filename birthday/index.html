@@ -658,6 +658,62 @@
     letter-spacing:.4px;
   }
 
+  /* ---------- ⚡ INTERACTIVE HAPPY 23 (no lightning) ---------- */
+  .interactive-23{
+    margin-top:28px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+  }
+  .reveal-age-btn{
+    font-family:inherit;
+    font-size:clamp(15px,3.8vw,18px);
+    font-weight:600;
+    padding:14px 32px;
+    border-radius:50px;
+    border:none;
+    cursor:pointer;
+    background:linear-gradient(135deg,#ff8fab,#d6336c);
+    color:#fff;
+    box-shadow:0 10px 26px rgba(214,51,108,.35);
+    transition:transform .3s cubic-bezier(.2,.9,.3,1.4), box-shadow .3s, opacity .5s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .reveal-age-btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 16px 34px rgba(214,51,108,.5);}
+  .reveal-age-btn:active{transform:scale(.97);}
+
+  .happy-23{
+    font-family:'Poppins',sans-serif;
+    font-weight:600;
+    font-size:clamp(30px,8vw,58px);
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:#fff;
+    text-shadow:
+      0 0 4px #fff,
+      0 0 12px #ffe3ee,
+      0 0 24px var(--pink),
+      0 0 44px var(--deep),
+      0 0 70px rgba(214,51,108,.85);
+    opacity:0;
+    transform:scale(.3) rotate(-8deg);
+    transition:opacity .8s ease, transform .8s cubic-bezier(.2,.9,.3,1.4);
+    text-align:center;
+    line-height:1.2;
+  }
+  .happy-23.show{
+    opacity:1;
+    transform:scale(1) rotate(0deg);
+    animation:neonFlicker 4s infinite;
+  }
+  @keyframes neonFlicker{
+    0%,16%,18%,20%,54%,56%,100%{opacity:1;filter:brightness(1);}
+    17%,55%{opacity:.5;filter:brightness(1.6);}
+    19%{opacity:.9;}
+    57%{opacity:.75;}
+  }
+
   @media(max-width:520px){
     .card{padding:30px 20px;border-radius:22px;}
     section{padding:55px 16px;}
@@ -723,6 +779,13 @@
     </div>
     <h1 id="heroName">Happy Birthday</h1>
     <div class="sub" id="heroDate"></div>
+
+    <!-- ⚡ INTERACTIVE HAPPY 23 (no lightning) -->
+    <div class="interactive-23">
+      <button id="revealAgeBtn" class="reveal-age-btn">🎁 Tap to Reveal Your Birthday Age</button>
+      <div id="happy23" class="happy-23">Happy 23</div>
+    </div>
+
     <div class="scroll-hint">scroll down ↓</div>
   </section>
 
@@ -1092,6 +1155,50 @@ musicBtn.addEventListener('click', function () {
   }
 });
 
+// ---------- ⚡ INTERACTIVE HAPPY 23 (no lightning) ----------
+(function () {
+  const revealBtn = document.getElementById('revealAgeBtn');
+  const happy23   = document.getElementById('happy23');
+  let revealed = false;
+
+  revealBtn.addEventListener('click', function () {
+    if (revealed) return;
+    revealed = true;
+
+    // Hide button with a smooth fade
+    revealBtn.style.transition = 'opacity .5s, transform .5s';
+    revealBtn.style.opacity = '0';
+    revealBtn.style.transform = 'scale(.8)';
+    setTimeout(function () {
+      revealBtn.style.display = 'none';
+    }, 500);
+
+    // Show "Happy 23" with animation
+    happy23.classList.add('show');
+
+    // Celebratory heart burst + floating hearts
+    heartBurst();
+    heartRain();
+
+    // Optional: play a little sound? Not implemented to keep it simple.
+  });
+
+  function heartRain() {
+    const emojis = ['💗', '💕', '🌸', '💖', '🌷', '✨', '💞', '🌺'];
+    for (let i = 0; i < 30; i++) {
+      const el = document.createElement('span');
+      el.className = 'rise';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = (Math.random() * 100) + 'vw';
+      el.style.fontSize = (14 + Math.random() * 26) + 'px';
+      el.style.animationDelay = (Math.random() * 1.2) + 's';
+      el.style.animationDuration = (2.6 + Math.random() * 1.6) + 's';
+      document.body.appendChild(el);
+      setTimeout(function () { el.remove(); }, 5200);
+    }
+  }
+})();
+
 // ---------- little game ----------
 (function () {
   const yesBtn = document.getElementById('yesBtn');
@@ -1164,8 +1271,8 @@ musicBtn.addEventListener('click', function () {
 // ---------- 🎂 birthday cake : blow the candles ----------
 (function () {
   const CANDLE_COUNT = 5;
-  const BLOW_RMS    = 0.13;  // how loud counts as a blow (try 0.08 – 0.25)
-  const BLOW_FRAMES = 7;     // how many frames in a row must be loud (~120ms)
+  const BLOW_RMS    = 0.13;
+  const BLOW_FRAMES = 7;
 
   const candlesWrap = document.getElementById('candles');
   const micBtn      = document.getElementById('micBtn');
@@ -1178,7 +1285,6 @@ musicBtn.addEventListener('click', function () {
   let micOn = false, rafId = null, blowFrames = 0;
   let audioCtx = null, analyser = null, micStream = null, timeData = null;
 
-  /* ---- build the candles ---- */
   for (let i = 0; i < CANDLE_COUNT; i++) {
     const c = document.createElement('div');
     c.className = 'candle';
@@ -1196,7 +1302,6 @@ musicBtn.addEventListener('click', function () {
     candlesWrap.appendChild(c);
   }
 
-  /* ---- one candle goes out ---- */
   function puffOut(candle) {
     if (candle.classList.contains('out')) return;
     candle.classList.add('out');
@@ -1216,7 +1321,6 @@ musicBtn.addEventListener('click', function () {
     }
   }
 
-  /* ---- all candles out ---- */
   function celebrate() {
     celebrated = true;
     cakeGlow.classList.add('off');
@@ -1249,7 +1353,6 @@ musicBtn.addEventListener('click', function () {
     }
   }
 
-  /* ---- microphone blow detection ---- */
   async function enableMic() {
     if (micOn || celebrated) return;
 
@@ -1331,7 +1434,6 @@ musicBtn.addEventListener('click', function () {
     micBtn.classList.remove('listening');
   }
 
-  /* ---- light them again ---- */
   relightBtn.addEventListener('click', function () {
     stopMic();
     celebrated = false;
